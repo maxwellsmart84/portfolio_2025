@@ -63,6 +63,38 @@ const Game = () => {
   // Game focus state
   const [gameStarted, setGameStarted] = useState(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
+  const dialogueRef = useRef<HTMLDivElement>(null);
+
+  // Dialogue system state
+  const [isDialogueActive, setIsDialogueActive] = useState(false);
+  const [currentDialogue, setCurrentDialogue] = useState<string>('');
+  const [dialogueTitle, setDialogueTitle] = useState<string>('');
+  const [displayedText, setDisplayedText] = useState<string>('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Portfolio dialogue content for each coin
+  const DIALOGUE_CONTENT = [
+    {
+      title: "Bear's Introduction",
+      text: "Hey! I'm Bear. Did you know Max built an NFT platform for artists to showcase their work? It helps creators monetize their digital art!",
+    },
+    {
+      title: 'Technical Skills',
+      text: 'Max is proficient in React, TypeScript, Node.js, and modern web technologies. He loves building full-stack applications!',
+    },
+    {
+      title: 'Problem Solver',
+      text: "When Max encounters a bug, he doesn't give up! He uses debugging tools, reads documentation, and finds creative solutions.",
+    },
+    {
+      title: 'Team Player',
+      text: 'Max enjoys collaborating with designers, product managers, and other developers. Communication is key to great software!',
+    },
+    {
+      title: 'Continuous Learner',
+      text: 'The tech world moves fast! Max stays current with new frameworks, tools, and best practices through courses and side projects.',
+    },
+  ];
 
   // Simple static background (no complex rendering)
   const drawBackground = useCallback((graphics: PIXI.Graphics) => {
@@ -103,6 +135,31 @@ const Game = () => {
       graphics.fill({ color: 0x2d1b3d });
     });
 
+    // Add windows to buildings
+    buildings.forEach(building => {
+      const windowWidth = 6;
+      const windowHeight = 4;
+      const windowSpacingX = 12;
+      const windowSpacingY = 15;
+
+      // Calculate how many windows can fit
+      const windowsPerRow = Math.floor((building.width - 10) / windowSpacingX);
+      const windowRows = Math.floor((building.height - 20) / windowSpacingY);
+
+      for (let row = 0; row < windowRows; row++) {
+        for (let col = 0; col < windowsPerRow; col++) {
+          // Randomly light some windows (about 60% chance)
+          if (Math.random() > 0.4) {
+            const windowX = building.x + 5 + col * windowSpacingX;
+            const windowY = building.y + 10 + row * windowSpacingY;
+
+            graphics.rect(windowX, windowY, windowWidth, windowHeight);
+            graphics.fill({ color: 0xffff88 }); // Yellow window light
+          }
+        }
+      }
+    });
+
     // Simple ground
     graphics.rect(0, 280, 1400, 20);
     graphics.fill({ color: 0x0a0a0a });
@@ -130,10 +187,6 @@ const Game = () => {
   useEffect(() => {
     const loadTextures = async () => {
       try {
-        // const runTexture = await PIXI.Assets.load('/assets/Punk_run.png');
-        // const idleTexture = await PIXI.Assets.load('/assets/Punk_idle.png');
-        // const jumpTexture = await PIXI.Assets.load('/assets/Punk_jump.png');
-        // Replacement: load from dog_spritesheet.json
         const sheet = await PIXI.Assets.load('/assets/bear_2.json');
         const coinSheet = await PIXI.Assets.load('/assets/coin.json');
         // Manually define textures using named textures from the sheet
@@ -166,13 +219,18 @@ const Game = () => {
     const handleKeyDown = (event: Event) => {
       const keyEvent = event as KeyboardEvent;
       const key = keyEvent.key.toLowerCase();
+
       // Prevent default behavior for game control keys
       if (
         ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd'].includes(key)
       ) {
         keyEvent.preventDefault();
       }
-      keysPressed.current.add(key);
+
+      // Don't process movement keys during dialogue
+      if (!isDialogueActive) {
+        keysPressed.current.add(key);
+      }
     };
 
     const handleKeyUp = (event: Event) => {
@@ -208,6 +266,13 @@ const Game = () => {
 
   // Game loop for movement and physics
   useEffect(() => {
+    // Don't run game loop during dialogue
+    if (isDialogueActive) {
+      // Clear movement keys but preserve physics state (velocity, position, grounded status)
+      keysPressed.current.clear();
+      return;
+    }
+
     const gameLoop = () => {
       const keys = keysPressed.current;
       let newVelX = velocity.x;
@@ -289,7 +354,17 @@ const Game = () => {
 
     const intervalId = setInterval(gameLoop, 16); // ~60fps
     return () => clearInterval(intervalId);
-  }, [position.x, position.y, velocity.x, velocity.y, isMoving, facingRight, isGrounded, cameraX]);
+  }, [
+    position.x,
+    position.y,
+    velocity.x,
+    velocity.y,
+    isMoving,
+    facingRight,
+    isGrounded,
+    cameraX,
+    isDialogueActive,
+  ]);
 
   // Update animation based on state
   useEffect(() => {
@@ -366,12 +441,79 @@ const Game = () => {
           if (!newCoins.has(index)) {
             newCoins.add(index);
             setScore(prevScore => prevScore + 100);
+
+            // Trigger dialogue for all coins with special cases for first and last
+            const totalCoinsCollected = collectedCoins.size + 1; // +1 because we're about to add this coin
+
+            console.log(
+              `Collecting coin ${index}, total collected will be: ${totalCoinsCollected}`
+            );
+
+            if (totalCoinsCollected === 1) {
+              // First coin collected - static introduction
+              setDialogueTitle(DIALOGUE_CONTENT[0].title);
+              setCurrentDialogue(DIALOGUE_CONTENT[0].text);
+              setIsDialogueActive(true);
+            } else if (totalCoinsCollected === 6) {
+              // Last coin collected - static thanks for playing
+              setDialogueTitle('Thanks for Playing!');
+              setCurrentDialogue(
+                "Thanks for checking out this portfolio game! Max built this with React, PIXI.js, and Aseprite. Want to work together? Let's chat!"
+              );
+              setIsDialogueActive(true);
+            } else if (DIALOGUE_CONTENT[totalCoinsCollected - 1]) {
+              // Middle coins (2-5) use content from array
+              setDialogueTitle(DIALOGUE_CONTENT[totalCoinsCollected - 1].title);
+              setCurrentDialogue(DIALOGUE_CONTENT[totalCoinsCollected - 1].text);
+              setIsDialogueActive(true);
+            }
           }
           return newCoins;
         });
       }
     });
   };
+
+  // Typewriter effect for dialogue
+  useEffect(() => {
+    if (!isDialogueActive || !currentDialogue) return;
+
+    setDisplayedText('');
+    setIsTyping(true);
+
+    let currentIndex = 0;
+    const typingSpeed = 30; // milliseconds per character
+
+    const typeInterval = setInterval(() => {
+      if (currentIndex < currentDialogue.length) {
+        setDisplayedText(currentDialogue.substring(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        setIsTyping(false);
+        clearInterval(typeInterval);
+      }
+    }, typingSpeed);
+
+    return () => clearInterval(typeInterval);
+  }, [currentDialogue, isDialogueActive]);
+
+  // Auto-focus dialogue when it appears
+  useEffect(() => {
+    if (isDialogueActive && dialogueRef.current) {
+      dialogueRef.current.focus();
+    }
+  }, [isDialogueActive]);
+
+  // Clear key states when dialogue ends to prevent stuck movement
+  useEffect(() => {
+    if (!isDialogueActive) {
+      keysPressed.current.clear();
+      // Return focus to game container when dialogue closes
+      if (gameContainerRef.current) {
+        gameContainerRef.current.focus();
+      }
+    }
+  }, [isDialogueActive]);
 
   return (
     <div
@@ -383,24 +525,76 @@ const Game = () => {
       {!gameStarted && (
         <div className="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-black">
           <div className="text-center">
-            <div className="mb-4 text-2xl text-cyan-400">🎮 Click to Start Game 🎮</div>
-            <div className="text-sm text-cyan-300">
-              This will give the game focus and prevent browser scrolling
+            <div className="font-arcade mb-4 animate-pulse text-2xl text-cyan-400">
+              🎮 CLICK TO START GAME 🎮
             </div>
+            <div className="font-arcade text-sm text-cyan-300">FOCUS GAME • PREVENT SCROLL</div>
           </div>
         </div>
       )}
 
-      <div className="absolute top-2 left-2 text-sm text-cyan-400">
+      <div className="font-arcade absolute top-2 left-2 text-sm text-cyan-400">
         Controls: A/D or Arrows to move, Space/W/Up to jump
       </div>
-      <div className="absolute top-6 left-2 text-xs text-cyan-400">
+      <div className="font-arcade absolute top-6 left-2 text-xs text-cyan-400">
         Position: ({Math.round(position.x)}, {Math.round(position.y)}) | Grounded:{' '}
         {isGrounded ? 'Yes' : 'No'}
       </div>
-      <div className="absolute top-10 left-2 text-xs text-cyan-400">
+      <div className="font-arcade absolute top-10 left-2 text-xs text-cyan-400">
         Score: {score} | Coins: {collectedCoins.size}/{COIN_POSITIONS.length}
       </div>
+
+      {/* Final Fantasy Style Dialogue Box */}
+      {isDialogueActive && (
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center"
+          ref={dialogueRef}
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key.toLowerCase() === 'a') {
+              e.preventDefault();
+              if (isTyping) {
+                // Skip typing animation
+                setDisplayedText(currentDialogue);
+                setIsTyping(false);
+              } else {
+                // Close dialogue
+                setIsDialogueActive(false);
+              }
+            }
+          }}
+          style={{ outline: 'none' }}
+        >
+          <div className="relative mx-4 max-w-2xl rounded-lg border-4 border-gray-300 bg-blue-800 p-6">
+            {/* Outer border effect */}
+            <div className="absolute inset-0 -m-1 rounded-lg border-2 border-blue-600 bg-blue-900"></div>
+
+            {/* Content */}
+            <div className="relative flex gap-4">
+              {/* Character Portrait */}
+              <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded border-2 border-gray-300 bg-blue-700">
+                <img
+                  src="/assets/bear_detail_1.png"
+                  alt="Bear"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* Text Content */}
+              <div className="flex-1">
+                <div className="font-arcade mb-2 text-sm text-white">{dialogueTitle}</div>
+                <div className="font-arcade text-xs leading-relaxed text-white">
+                  {displayedText}
+                  {isTyping && <span className="animate-pulse">|</span>}
+                </div>
+                <div className="font-arcade mt-4 text-right text-xs text-gray-300">
+                  {isTyping ? 'Press A to skip...' : 'Press A to continue...'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Application width={appSize.width} height={appSize.height} backgroundColor={0x0f0f1a}>
         <pixiContainer ref={containerRef} x={-cameraX}>
