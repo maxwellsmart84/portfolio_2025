@@ -1,5 +1,6 @@
 'use client';
 
+import Game from '@/components/Game';
 import PriceChart from '@/components/PriceChart';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -98,6 +99,10 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      <section id="game" className="px-4 py-24 text-center">
+        <Game />
       </section>
 
       <section id="tech" className="px-4 py-24 text-center">

@@ -1,16 +1,16 @@
 'use client';
 
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 type TickerEnum = 'btcusdt' | 'ethusdt' | 'bnbusdt' | 'solusdt';
 
@@ -23,14 +23,14 @@ interface PriceChartProps {
   ticker: TickerEnum;
 }
 
-const currencyMap:Record<TickerEnum, string> = {
+const currencyMap: Record<TickerEnum, string> = {
   btcusdt: 'BTC/USDT',
   ethusdt: 'ETH/USDT',
   bnbusdt: 'BNB/USDT',
   solusdt: 'SOL/USDT',
 };
 
-export default function PriceChart( { ticker }: PriceChartProps ) {
+export default function PriceChart({ ticker }: PriceChartProps) {
   const [marketData, setMarketData] = useState<PricePoint[]>([]);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 0 });
   const socketRef = useRef<WebSocket | null>(null);
@@ -46,7 +46,7 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
       const padding = Math.max((max - min) * 0.05, 25); // 5% or at least $25 padding
       setPriceRange({
         min: min - padding,
-        max: max + padding
+        max: max + padding,
       });
     }
   }, [marketData]);
@@ -57,7 +57,7 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
       `wss://stream.binance.com:9443/ws/${ticker}@ticker`,
       `wss://stream.binance.com:443/ws/${ticker}@ticker`,
       `wss://data-stream.binance.vision:9443/ws/${ticker}@ticker`,
-      `wss://stream.binance.us:9443/ws/${ticker}@ticker`
+      `wss://stream.binance.us:9443/ws/${ticker}@ticker`,
     ];
 
     let currentEndpointIndex = 0;
@@ -72,7 +72,7 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
 
       const endpoint = endpoints[currentEndpointIndex];
       console.log(`Attempting to connect to: ${endpoint}`);
-      
+
       const ws = new WebSocket(endpoint);
       socketRef.current = ws;
 
@@ -80,21 +80,21 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
         console.log(`Successfully connected to: ${endpoint}`);
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = event => {
         try {
           const data = JSON.parse(event.data);
-          console.log('Received data:', data);
-          
+          // console.log('Received data:', data)
+
           const price = parseFloat(data.c);
-          console.log('Price:', price);
+          // console.log('Price:', price);
           const time = new Date().toLocaleTimeString();
           const newPoint = { time, price };
 
-          setMarketData((prev) => {
+          setMarketData(prev => {
             const updated = [...prev, newPoint];
             return updated.length > 100 ? updated.slice(-100) : updated;
           });
-          
+
           // Set loading to false once we receive first data
           setIsLoading(false);
         } catch (error) {
@@ -102,14 +102,14 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
         }
       };
 
-      ws.onerror = (err) => {
+      ws.onerror = err => {
         console.error(`WebSocket Error for ${endpoint}:`, err);
         console.error('WebSocket readyState:', ws.readyState);
         currentEndpointIndex++;
         setTimeout(connectWebSocket, 2000); // Try next endpoint after 2 seconds
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = event => {
         console.log(`WebSocket closed for ${endpoint}:`, event.code, event.reason);
         if (event.code !== 1000) {
           currentEndpointIndex++;
@@ -121,15 +121,15 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
     // const startMockData = () => {
     //   console.log('Starting mock BTC price data...');
     //   let mockPrice = 95000; // Starting price around $95k
-      
+
     //   const interval = setInterval(() => {
     //     // Simulate price movement
     //     const change = (Math.random() - 0.5) * 100; // Random change between -$50 and +$50
     //     mockPrice += change;
-        
+
     //     const time = new Date().toLocaleTimeString();
     //     const newPoint = { time, price: mockPrice };
-        
+
     //     setMarketData((prev) => {
     //       const updated = [...prev, newPoint];
     //       return updated.length > 100 ? updated.slice(-100) : updated;
@@ -151,42 +151,48 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
   }, []);
 
   return (
-    <div className="text-center border border-cyan-500 rounded-lg bg-gray-900 text-white shadow-[0_0_10px_cyan]">
+    <div className="rounded-lg border border-cyan-500 bg-gray-900 text-center text-white shadow-[0_0_10px_cyan]">
       {/* Header section - always visible */}
-      <div 
-        className="p-3 sm:p-4 md:p-6 cursor-pointer flex items-center justify-between hover:bg-gray-800/50 transition-colors rounded-t-lg"
+      <div
+        className="flex cursor-pointer items-center justify-between rounded-t-lg p-3 transition-colors hover:bg-gray-800/50 sm:p-4 md:p-6"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex-1 min-w-0">
-          <h2 className="text-sm sm:text-lg md:text-xl mb-1 sm:mb-2 text-cyan-300 truncate">
+        <div className="min-w-0 flex-1">
+          <h2 className="mb-1 truncate text-sm text-cyan-300 sm:mb-2 sm:text-lg md:text-xl">
             Live {currencyMap[ticker]} Price (Binance)
           </h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-2 sm:py-4">
-              <Loader2 className="w-4 h-4 sm:w-6 md:w-8 sm:h-6 md:h-8 text-cyan-400 animate-spin mr-1 sm:mr-2" />
-              <span className="text-cyan-400 text-xs sm:text-sm md:text-lg">Loading price data...</span>
+              <Loader2 className="mr-1 h-4 w-4 animate-spin text-cyan-400 sm:mr-2 sm:h-6 sm:w-6 md:h-8 md:w-8" />
+              <span className="text-xs text-cyan-400 sm:text-sm md:text-lg">
+                Loading price data...
+              </span>
             </div>
           ) : marketData.length > 0 ? (
-            <div className="text-lg sm:text-2xl md:text-3xl font-mono text-cyan-400 animate-pulse break-all">
-              ${marketData[marketData.length - 1].price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <div className="animate-pulse font-mono text-lg break-all text-cyan-400 sm:text-2xl md:text-3xl">
+              $
+              {marketData[marketData.length - 1].price.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </div>
           ) : (
-            <div className="text-sm sm:text-base md:text-lg text-gray-400">No data available</div>
+            <div className="text-sm text-gray-400 sm:text-base md:text-lg">No data available</div>
           )}
         </div>
-        <div className="ml-2 sm:ml-4 flex-shrink-0">
+        <div className="ml-2 flex-shrink-0 sm:ml-4">
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6 text-cyan-400 transition-transform" />
+            <ChevronUp className="h-4 w-4 text-cyan-400 transition-transform sm:h-5 sm:w-5 md:h-6 md:w-6" />
           ) : (
-            <ChevronDown className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6 text-cyan-400 transition-transform" />
+            <ChevronDown className="h-4 w-4 text-cyan-400 transition-transform sm:h-5 sm:w-5 md:h-6 md:w-6" />
           )}
         </div>
       </div>
-      
+
       {/* Chart section - only visible when expanded */}
       {isExpanded && (
         <div className="px-3 pb-3 sm:px-4 sm:pb-4 md:px-6 md:pb-6">
-          <div className="h-[250px] sm:h-[300px] md:h-[400px] w-full">
+          <div className="h-[250px] w-full sm:h-[300px] md:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={marketData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -201,7 +207,7 @@ export default function PriceChart( { ticker }: PriceChartProps ) {
                   className="sm:w-20 md:w-24"
                   stroke="#888"
                   tick={{ fill: '#888', fontSize: 10 }}
-                  tickFormatter={(value) =>
+                  tickFormatter={value =>
                     `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
                   }
                   domain={[priceRange.min, priceRange.max]}
