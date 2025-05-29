@@ -4,9 +4,6 @@ import { Application, extend } from '@pixi/react';
 import * as PIXI from 'pixi.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const RUN_FRAME_COUNT = 6;
-const IDLE_FRAME_COUNT = 4;
-const JUMP_FRAME_COUNT = 4;
 const MOVE_SPEED = 4;
 const JUMP_FORCE = 12;
 const GRAVITY = 0.5;
@@ -19,6 +16,16 @@ const PLATFORMS = [
   { x: 500, y: 150, width: 100, height: 20 }, // Platform 2
   { x: 700, y: GROUND_Y, width: 200, height: 50 }, // Ground end
   { x: 950, y: 180, width: 120, height: 20 }, // Platform 3
+];
+
+// Coin positions
+const COIN_POSITIONS = [
+  { x: 150, y: GROUND_Y - 30 }, // Ground coin 1
+  { x: 375, y: 170 }, // Platform 1 coin
+  { x: 550, y: 120 }, // Platform 2 coin
+  { x: 800, y: GROUND_Y - 30 }, // Ground coin 2
+  { x: 1010, y: 150 }, // Platform 3 coin
+  { x: 250, y: GROUND_Y - 60 }, // Floating coin
 ];
 
 extend({
@@ -34,7 +41,8 @@ const Game = () => {
   const [runTextures, setRunTextures] = useState<PIXI.Texture[]>([]);
   const [idleTextures, setIdleTextures] = useState<PIXI.Texture[]>([]);
   const [jumpTextures, setJumpTextures] = useState<PIXI.Texture[]>([]);
-  const [appSize] = useState({ width: 800, height: 300 });
+  const [coinTextures, setCoinTextures] = useState<PIXI.Texture[]>([]);
+  const [appSize] = useState({ width: 5000, height: 300 });
   const [isLoading, setIsLoading] = useState(true);
 
   // Movement state
@@ -47,6 +55,14 @@ const Game = () => {
 
   // Camera state
   const [cameraX, setCameraX] = useState(0);
+
+  // Coin collection state
+  const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
+  const [score, setScore] = useState(0);
+
+  // Game focus state
+  const [gameStarted, setGameStarted] = useState(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
 
   // Simple static background (no complex rendering)
   const drawBackground = useCallback((graphics: PIXI.Graphics) => {
@@ -114,65 +130,27 @@ const Game = () => {
   useEffect(() => {
     const loadTextures = async () => {
       try {
-        console.log('Attempting to load textures...');
+        // const runTexture = await PIXI.Assets.load('/assets/Punk_run.png');
+        // const idleTexture = await PIXI.Assets.load('/assets/Punk_idle.png');
+        // const jumpTexture = await PIXI.Assets.load('/assets/Punk_jump.png');
+        // Replacement: load from dog_spritesheet.json
+        const sheet = await PIXI.Assets.load('/assets/bear_2.json');
+        const coinSheet = await PIXI.Assets.load('/assets/coin.json');
+        // Manually define textures using named textures from the sheet
+        const run = [
+          sheet.textures['bear_2 #run 2.png'],
+          sheet.textures['bear_2 #run 1.png'],
+          sheet.textures['bear_2 #run 0.png'],
+        ];
+        const jump = [sheet.textures['bear_2 #jump.png']];
+        const idle = [sheet.textures['bear_2 #idle.png']];
 
-        // Load all sprite sheets
-        const runTexture = await PIXI.Assets.load('/assets/Punk_run.png');
-        const idleTexture = await PIXI.Assets.load('/assets/Punk_idle.png');
-        const jumpTexture = await PIXI.Assets.load('/assets/Punk_jump.png');
-
-        console.log('Run texture size:', runTexture.width, 'x', runTexture.height);
-        console.log('Idle texture size:', idleTexture.width, 'x', idleTexture.height);
-        console.log('Jump texture size:', jumpTexture.width, 'x', jumpTexture.height);
-
-        // Calculate frame sizes for each animation
-        const runFrameWidth = runTexture.width / RUN_FRAME_COUNT;
-        const runFrameHeight = runTexture.height;
-        const idleFrameWidth = idleTexture.width / IDLE_FRAME_COUNT;
-        const idleFrameHeight = idleTexture.height;
-        const jumpFrameWidth = jumpTexture.width / JUMP_FRAME_COUNT;
-        const jumpFrameHeight = jumpTexture.height;
-
-        console.log(`Run frame size: ${runFrameWidth} x ${runFrameHeight}`);
-        console.log(`Idle frame size: ${idleFrameWidth} x ${idleFrameHeight}`);
-        console.log(`Jump frame size: ${jumpFrameWidth} x ${jumpFrameHeight}`);
-
-        // Create run animation frames
-        const run: PIXI.Texture[] = [];
-        for (let i = 0; i < RUN_FRAME_COUNT; i++) {
-          const frame = new PIXI.Texture({
-            source: runTexture.source,
-            frame: new PIXI.Rectangle(i * runFrameWidth, 0, runFrameWidth, runFrameHeight),
-          });
-          run.push(frame);
-        }
-
-        // Create idle animation frames
-        const idle: PIXI.Texture[] = [];
-        for (let i = 0; i < IDLE_FRAME_COUNT; i++) {
-          const frame = new PIXI.Texture({
-            source: idleTexture.source,
-            frame: new PIXI.Rectangle(i * idleFrameWidth, 0, idleFrameWidth, idleFrameHeight),
-          });
-          idle.push(frame);
-        }
-
-        // Create jump animation frames
-        const jump: PIXI.Texture[] = [];
-        for (let i = 0; i < JUMP_FRAME_COUNT; i++) {
-          const frame = new PIXI.Texture({
-            source: jumpTexture.source,
-            frame: new PIXI.Rectangle(i * jumpFrameWidth, 0, jumpFrameWidth, jumpFrameHeight),
-          });
-          jump.push(frame);
-        }
-
-        console.log(
-          `Created ${run.length} run frames, ${idle.length} idle frames, and ${jump.length} jump frames`
-        );
         setRunTextures(run);
         setIdleTextures(idle);
         setJumpTextures(jump);
+        // Fix coin textures - convert to array properly
+        const coinTextureArray = Object.values(coinSheet.textures) as PIXI.Texture[];
+        setCoinTextures(coinTextureArray);
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to load textures:', error);
@@ -185,22 +163,48 @@ const Game = () => {
 
   // Handle keyboard input
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      keysPressed.current.add(event.key.toLowerCase());
+    const handleKeyDown = (event: Event) => {
+      const keyEvent = event as KeyboardEvent;
+      const key = keyEvent.key.toLowerCase();
+      // Prevent default behavior for game control keys
+      if (
+        ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd'].includes(key)
+      ) {
+        keyEvent.preventDefault();
+      }
+      keysPressed.current.add(key);
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      keysPressed.current.delete(event.key.toLowerCase());
+    const handleKeyUp = (event: Event) => {
+      const keyEvent = event as KeyboardEvent;
+      const key = keyEvent.key.toLowerCase();
+      // Prevent default behavior for game control keys
+      if (
+        ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd'].includes(key)
+      ) {
+        keyEvent.preventDefault();
+      }
+      keysPressed.current.delete(key);
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    // Attach to game container if started, otherwise to window
+    const target = gameStarted && gameContainerRef.current ? gameContainerRef.current : window;
+    target.addEventListener('keydown', handleKeyDown);
+    target.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      target.removeEventListener('keydown', handleKeyDown);
+      target.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [gameStarted]);
+
+  // Handle game start/focus
+  const handleGameStart = () => {
+    setGameStarted(true);
+    if (gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
+  };
 
   // Game loop for movement and physics
   useEffect(() => {
@@ -237,7 +241,7 @@ const Game = () => {
       const newY = position.y + newVelY;
 
       // Check collisions
-      const collision = checkCollisions(newX, newY);
+      const collision = checkCollisions(newX, newY, newVelY);
 
       let finalY = newY;
       let finalVelY = newVelY;
@@ -249,6 +253,18 @@ const Game = () => {
 
       // Keep character in horizontal bounds (expand world)
       const finalX = Math.max(50, Math.min(1200, newX));
+
+      // Check if character fell off the screen and reset to starting position
+      if (finalY > 400) {
+        setPosition({ x: 100, y: GROUND_Y }); // Reset to starting position
+        setVelocity({ x: 0, y: 0 }); // Reset velocity
+        setIsGrounded(true);
+        return; // Exit early to prevent further updates this frame
+      }
+
+      // Check coin collection (check both old and new position to prevent skipping)
+      checkCoinCollection(position.x, position.y); // Check current position
+      checkCoinCollection(finalX, finalY); // Check new position
 
       // Update states
       setPosition({ x: finalX, y: finalY });
@@ -307,27 +323,24 @@ const Game = () => {
   }, [isMoving, isGrounded, idleTextures, runTextures, jumpTextures]);
 
   // Collision detection
-  const checkCollisions = (newX: number, newY: number) => {
-    const characterBounds = {
-      x: newX - 24, // Half character width
-      y: newY - 48, // Character height (anchored at bottom)
-      width: 48,
-      height: 48,
-    };
+  const checkCollisions = (newX: number, newY: number, currentVelY: number) => {
+    // Character is anchored at bottom, so newY is the bottom of the character
+    const characterLeft = newX - 24; // Half character width
+    const characterRight = newX + 24;
+    const characterBottom = newY;
 
     let onGround = false;
     let collisionY = newY;
 
     for (const platform of PLATFORMS) {
-      // Check if character is above platform and falling/stationary
-      if (
-        characterBounds.x < platform.x + platform.width &&
-        characterBounds.x + characterBounds.width > platform.x &&
-        characterBounds.y + characterBounds.height <= platform.y + 5 && // Small tolerance
-        characterBounds.y + characterBounds.height >= platform.y - 5
-      ) {
-        if (velocity.y >= 0) {
-          // Only when falling or stationary
+      // Check horizontal overlap
+      const horizontalOverlap =
+        characterLeft < platform.x + platform.width && characterRight > platform.x;
+
+      // Check if character is landing on top of platform
+      if (horizontalOverlap && currentVelY >= 0) {
+        // Character bottom should be near platform top
+        if (characterBottom >= platform.y && characterBottom <= platform.y + 15) {
           onGround = true;
           collisionY = platform.y;
           break;
@@ -338,14 +351,55 @@ const Game = () => {
     return { onGround, y: collisionY };
   };
 
+  // Coin collection checking
+  const checkCoinCollection = (x: number, y: number) => {
+    COIN_POSITIONS.forEach((coin, index) => {
+      // Skip if already collected
+      if (collectedCoins.has(index)) return;
+
+      // More generous collision detection
+      const distance = Math.sqrt((x - coin.x) ** 2 + (y - coin.y) ** 2);
+      if (distance < 35) {
+        // Increased from 20 to 35 for easier collection
+        setCollectedCoins(prevCoins => {
+          const newCoins = new Set(prevCoins);
+          if (!newCoins.has(index)) {
+            newCoins.add(index);
+            setScore(prevScore => prevScore + 100);
+          }
+          return newCoins;
+        });
+      }
+    });
+  };
+
   return (
-    <div className="relative w-full overflow-hidden rounded-xl border border-cyan-500 bg-black shadow-[0_0_20px_cyan]">
+    <div
+      ref={gameContainerRef}
+      className="relative w-full overflow-hidden rounded-xl border border-cyan-500 bg-black shadow-[0_0_20px_cyan] focus:outline-none"
+      tabIndex={0}
+      onClick={handleGameStart}
+    >
+      {!gameStarted && (
+        <div className="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-black">
+          <div className="text-center">
+            <div className="mb-4 text-2xl text-cyan-400">🎮 Click to Start Game 🎮</div>
+            <div className="text-sm text-cyan-300">
+              This will give the game focus and prevent browser scrolling
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-2 left-2 text-sm text-cyan-400">
         Controls: A/D or Arrows to move, Space/W/Up to jump
       </div>
       <div className="absolute top-6 left-2 text-xs text-cyan-400">
         Position: ({Math.round(position.x)}, {Math.round(position.y)}) | Grounded:{' '}
         {isGrounded ? 'Yes' : 'No'}
+      </div>
+      <div className="absolute top-10 left-2 text-xs text-cyan-400">
+        Score: {score} | Coins: {collectedCoins.size}/{COIN_POSITIONS.length}
       </div>
 
       <Application width={appSize.width} height={appSize.height} backgroundColor={0x0f0f1a}>
@@ -355,6 +409,31 @@ const Game = () => {
 
           {/* Platforms */}
           <pixiGraphics draw={drawPlatforms} />
+
+          {/* Coins */}
+          {coinTextures.length > 0 &&
+            COIN_POSITIONS.map((coin, index) => {
+              if (!collectedCoins.has(index)) {
+                return (
+                  <pixiAnimatedSprite
+                    key={`coin-${index}`}
+                    textures={coinTextures}
+                    loop={true}
+                    x={coin.x}
+                    y={coin.y}
+                    anchor={{ x: 0.5, y: 0.5 }}
+                    scale={{ x: 1.5, y: 1.5 }}
+                    animationSpeed={0.2}
+                    ref={(sprite: PIXI.AnimatedSprite | null) => {
+                      if (sprite && !sprite.playing) {
+                        sprite.play();
+                      }
+                    }}
+                  />
+                );
+              }
+              return null;
+            })}
 
           {/* Character */}
           {idleTextures.length > 0 &&

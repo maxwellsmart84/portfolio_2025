@@ -82,7 +82,10 @@ export default function Home() {
         <h2 className="mb-10 text-3xl text-cyan-400">Projects</h2>
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
           <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
-            <CardContent className="p-6">
+            <CardContent
+              onClick={() => window.open('https://commission-marketplace.vercel.app', '_blank')}
+              className="p-6"
+            >
               <h3 className="mb-2 text-xl font-bold text-purple-300">Commission Marketplace</h3>
               <p className="text-purple-200">
                 A platform to hire mini painters, built with Clerk, Open Federation, and Next.js.
@@ -102,7 +105,9 @@ export default function Home() {
       </section>
 
       <section id="game" className="px-4 py-24 text-center">
-        <Game />
+        <div className="flex w-full justify-center">
+          <Game />
+        </div>
       </section>
 
       <section id="tech" className="px-4 py-24 text-center">
@@ -123,7 +128,7 @@ export default function Home() {
         <h2 className="mb-6 text-3xl text-cyan-400">Contact</h2>
         <p className="mb-4 text-purple-200">Got a project or just want to talk Warhammer?</p>
         <a href="mailto:max@example.com" className="text-cyan-300 underline hover:text-cyan-100">
-          max@example.com
+          maxwell.l.krause@gmail.com
         </a>
       </section>
 
