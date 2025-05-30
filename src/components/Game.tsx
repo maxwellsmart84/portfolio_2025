@@ -521,26 +521,59 @@ const Game = () => {
       className="relative w-full overflow-hidden rounded-xl border border-cyan-500 bg-black shadow-[0_0_20px_cyan] focus:outline-none"
       tabIndex={0}
       onClick={handleGameStart}
+      onTouchStart={e => {
+        e.preventDefault();
+        if (isDialogueActive) {
+          // Handle dialogue on touch
+          if (isTyping) {
+            setDisplayedText(currentDialogue);
+            setIsTyping(false);
+          } else {
+            setIsDialogueActive(false);
+          }
+          return;
+        }
+
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const isLeftHalf = touchX < rect.width / 2;
+
+        // Add movement keys based on touch location
+        keysPressed.current.add(isLeftHalf ? 'a' : 'd');
+        keysPressed.current.add(' '); // Always jump
+      }}
+      onTouchEnd={e => {
+        e.preventDefault();
+        if (!isDialogueActive) {
+          // Clear movement keys
+          keysPressed.current.delete('a');
+          keysPressed.current.delete('d');
+          keysPressed.current.delete(' ');
+        }
+      }}
     >
       {!gameStarted && (
         <div className="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-black">
           <div className="text-center">
             <div className="font-arcade mb-4 animate-pulse text-2xl text-cyan-400">
-              🎮 CLICK TO START GAME 🎮
+              🎮 CLICK/TOUCH TO START GAME 🎮
             </div>
-            <div className="font-arcade text-sm text-cyan-300">FOCUS GAME • PREVENT SCROLL</div>
+            <div className="font-arcade text-sm text-cyan-300">LEARN MORE ABOUT MAX</div>
           </div>
         </div>
       )}
 
       <div className="font-arcade absolute top-2 left-2 text-sm text-cyan-400">
         Controls: A/D or Arrows to move, Space/W/Up to jump
+        <br />
+        <span className="text-xs">Mobile: Tap left/right half to move & jump</span>
       </div>
-      <div className="font-arcade absolute top-6 left-2 text-xs text-cyan-400">
+      {/* <div className="font-arcade absolute top-6 left-2 text-xs text-cyan-400">
         Position: ({Math.round(position.x)}, {Math.round(position.y)}) | Grounded:{' '}
         {isGrounded ? 'Yes' : 'No'}
-      </div>
-      <div className="font-arcade absolute top-10 left-2 text-xs text-cyan-400">
+      </div> */}
+      <div className="font-arcade absolute top-12 left-2 text-xs text-cyan-400">
         Score: {score} | Coins: {collectedCoins.size}/{COIN_POSITIONS.length}
       </div>
 
