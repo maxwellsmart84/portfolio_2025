@@ -15,12 +15,36 @@ export default function Home() {
   //   console.log("Button clicked");
   // };
 
+  const COMPANY_LOGOS = [
+    { name: 'fastbreak', src: '/assets/fastbreak.svg', link: 'https://fastbreak.ai' },
+    { name: 'planelogix', src: '/assets/planelogix.svg', link: 'https://planelogix.com' },
+    { name: 'rhinogram', src: '/assets/rhinogram.svg', link: 'https://rhinogram.com' },
+    { name: 'roobet', src: '/assets/roobet.svg', link: 'https://roobet.com' },
+    { name: 'vw', src: '/assets/vw.svg', link: 'https://vw.com' },
+    { name: 'audi', src: '/assets/audi.svg', link: 'https://audi.com' },
+  ];
+
   return (
     <main className="relative min-h-screen scroll-smooth text-white">
       <LaserLightLayer />
       <div className="relative z-10">
         <section id="hero" className="flex flex-col items-center justify-center px-4 text-center">
           <div className="w-full py-8">
+            <motion.div
+              animate={{
+                opacity: [1, 0, 1, 0, 1, 0, 1, 1, 1, 1],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatDelay: 2,
+                times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1],
+              }}
+              className="font-arcade flex items-center justify-center gap-2 text-xl text-purple-300 drop-shadow-[0_0_10px_purple]"
+            >
+              HACKER NEWS
+            </motion.div>
+
             <NewsTicker />
           </div>
           <div className="flex w-full flex-col justify-evenly md:flex-row">
@@ -63,10 +87,14 @@ export default function Home() {
           </div>
 
           <div className="flex gap-4">
-            <Button className="bg-cyan-500 shadow-[0_0_10px_cyan] hover:bg-cyan-400">
+            <Button
+              className="bg-cyan-500 shadow-[0_0_10px_cyan] hover:bg-cyan-400"
+              onClick={() => window.open('https://github.com/maxwellsmart84', '_blank')}
+            >
               View Projects
             </Button>
             <Button
+              onClick={() => window.open('mailto:maxwell.l.krause@gmail.com', '_blank')}
               variant="outline"
               className="border-purple-400 text-purple-400 hover:bg-purple-800"
             >
@@ -118,7 +146,26 @@ export default function Home() {
         <section id="tech" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Tech Stack</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            {['Next.js', 'TypeScript', 'GraphQL', 'Tailwind', 'Firebase', 'Solana'].map(tech => (
+            {[
+              'Next.js',
+              'Vue',
+              'React',
+              'Node.js',
+              'TypeScript',
+              'GraphQL',
+              'Tailwind',
+              'Firebase',
+              'Web3',
+              'Rust',
+              'MongoDB',
+              'MySQL',
+              'PostgreSQL',
+              'Redis',
+              'Docker',
+              'Kubernetes',
+              'AWS',
+              'GCP',
+            ].map(tech => (
               <Badge
                 key={tech}
                 className="border border-purple-400 bg-purple-900 text-purple-200 shadow-[0_0_10px_purple]"
@@ -131,15 +178,17 @@ export default function Home() {
         <section id="trusted-by" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Trusted By</h2>
           <div className="mx-auto flex flex-wrap items-center justify-center gap-12">
-            {['fastbreak', 'planelogix', 'rhinogram', 'roobet', 'vw', 'audi'].map(name => (
-              <Image
-                key={name}
-                src={`/assets/${name}.svg`}
-                alt={`${name} logo`}
-                className="h-32 w-32 object-contain opacity-60 invert transition-all hover:opacity-100"
-                width={128}
-                height={128}
-              />
+            {COMPANY_LOGOS.map(company => (
+              <a key={company.name} href={company.link} target="_blank" rel="noopener noreferrer">
+                <Image
+                  key={company.name}
+                  src={company.src}
+                  alt={`${company.name} logo`}
+                  className="h-32 w-32 object-contain opacity-60 invert transition-all hover:opacity-100"
+                  width={128}
+                  height={128}
+                />
+              </a>
             ))}
           </div>
         </section>
@@ -150,6 +199,24 @@ export default function Home() {
           <a href="mailto:max@example.com" className="text-cyan-300 underline hover:text-cyan-100">
             maxwell.l.krause@gmail.com
           </a>
+          <div className="flex justify-center gap-4 pt-2">
+            <a href="https://github.com/maxwellkrause" target="_blank" rel="noopener noreferrer">
+              <Image src="/assets/github.svg" alt="Github" width={32} height={32} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/maxwell-krause/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                className="invert"
+                src="/assets/linkedin.svg"
+                alt="Linkedin"
+                width={32}
+                height={32}
+              />
+            </a>
+          </div>
         </section>
 
         <footer className="py-10 text-center text-sm text-purple-600">
