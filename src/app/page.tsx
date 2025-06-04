@@ -108,14 +108,97 @@ export default function Home() {
             <Game />
           </div>
         </section>
-
-        {/* <section id="about" className="px-4 py-12 text-center">
-          <h2 className="mb-4 text-3xl text-cyan-400">About Me</h2>
-          <p className="mx-auto max-w-2xl text-purple-200">
-            I specialize in full-stack web apps, blending great UX with smart architecture. I've built
-            everything from NFT platforms to Warhammer tools.
-          </p>
+        {/* <section id="synth" className="px-4 py-12 text-center">
+          <SynthControls />
         </section> */}
+
+        <section id="community" className="px-4 py-12 text-center">
+          <h2 className="mb-6 text-3xl text-cyan-400">Community & Mentorship</h2>
+          <div className="mx-auto flex w-2/3 flex-col gap-8">
+            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+              <CardContent>
+                <div className="mx-auto flex items-center justify-center gap-4">
+                  <a
+                    href="https://www.tealsk12.org/"
+                    className="flex items-center gap-4 text-cyan-300 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <h3 className="text-xl font-bold text-purple-300">Microsoft TEALS Program</h3>
+                  </a>
+                </div>
+
+                <p className="mx-auto max-w-xl text-purple-200">
+                  I spent 2 years volunteering at Charleston Charter Math and Science helping high
+                  school students learn computer science with Python. It was one of the most
+                  rewarding parts of my journey — and reminded me how much I love demystifying tech
+                  for others.
+                </p>
+                <div className="flex justify-center gap-4">
+                  <a
+                    href="https://charlestonmathscience.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image src="/assets/ccms.png" alt="CCMS" width={128} height={128} />
+                  </a>
+                  <a
+                    href="https://www.tealsk12.org/"
+                    className="flex items-center gap-4 text-cyan-300 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image
+                      src="assets/microsoft.svg"
+                      alt="Microsoft"
+                      width={128}
+                      height={128}
+                      className="text-purple-300"
+                    />
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+              <CardContent>
+                <iframe
+                  className="h-48 w-full rounded md:h-56"
+                  src="https://www.youtube.com/embed/x4Yqf4iGZrc?si=5GjJ9XMK-s6xhBK6"
+                  title="AI Video Contest Winner"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+                <h3 className="mt-4 mb-2 text-xl font-bold text-purple-300">
+                  <a
+                    href="https://www.linkedin.com/posts/maxwell-krause_what-activity-7324048826065956864-DbBl?utm_source=share&utm_medium=member_desktop&rcm=ACoAAASdmFwBIsETXVezGV4dyzRSg-2erWFJiLA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-300 hover:underline"
+                  >
+                    Charleston Hacks 2025 AI Video Contest Winner
+                  </a>
+                </h3>
+                <p className="text-purple-200">
+                  I won people&apos;s choice award place in an AI video creation contest where I
+                  animated my miniatures.
+                </p>
+                <div className="flex justify-center pt-4">
+                  <a href="https://charlestonhacks.com/" target="_blank" rel="noopener noreferrer">
+                    <Image
+                      src="/assets/charleston-hacks.jpeg"
+                      alt="Charleston Hacks"
+                      width={128}
+                      height={128}
+                      className="invert"
+                    />
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
 
         <section id="projects" className="px-4 py-12 text-center">
           <h2 className="mb-10 text-3xl text-cyan-400">Projects</h2>
@@ -123,21 +206,50 @@ export default function Home() {
             <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent
                 onClick={() => window.open('https://commission-marketplace.vercel.app', '_blank')}
-                className="p-6"
+                className="cursor-pointer p-6"
               >
+                <Image
+                  src="/assets/commission-marketplace-preview.png"
+                  alt="Commission Marketplace"
+                  width={512}
+                  height={288}
+                  className="mb-4 rounded border border-purple-400 shadow-lg"
+                />
                 <h3 className="mb-2 text-xl font-bold text-purple-300">Commission Marketplace</h3>
                 <p className="text-purple-200">
-                  A platform to hire mini painters, built with Clerk, Open Federation, and Next.js.
+                  A platform for hiring Warhammer miniature painters. Artists create portfolios,
+                  clients post jobs, and commissions are negotiated with built-in messaging and
+                  milestone tracking.
                 </p>
+                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
+                  <li>Built with Next.js, Clerk, and Tailwind</li>
+                  <li>GraphQL Federation via WunderGraph Cosmo</li>
+                  <li>Stripe and escrow-style logic for payments</li>
+                </ul>
+                <p className="mt-2 text-sm text-cyan-400">Demo coming soon</p>
               </CardContent>
             </Card>
 
             <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent className="p-6">
+                <Image
+                  src="/assets/challenger-app.png"
+                  alt="Challenge App"
+                  width={512}
+                  height={288}
+                  className="mb-4 rounded border border-purple-400 shadow-lg"
+                />
                 <h3 className="mb-2 text-xl font-bold text-purple-300">Challenge App</h3>
                 <p className="text-purple-200">
-                  Proximity-based app for 1v1 matchups. Firebase + PlanetScale + Tailwind.
+                  A proximity-based mobile-friendly web app to find and play 1v1 tabletop matches.
+                  Designed for in-store pickup games and local leagues.
                 </p>
+                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
+                  <li>Real-time location & matchmaking with Firebase</li>
+                  <li>PlanetScale + Drizzle ORM schema for user inventory</li>
+                  <li>Push notifications and real-time updates with Pusher</li>
+                </ul>
+                <p className="mt-2 text-sm text-cyan-400">Demo coming soon</p>
               </CardContent>
             </Card>
           </div>
@@ -162,7 +274,6 @@ export default function Home() {
               'PostgreSQL',
               'Redis',
               'Docker',
-              'Kubernetes',
               'AWS',
               'GCP',
             ].map(tech => (

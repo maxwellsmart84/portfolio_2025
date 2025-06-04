@@ -72,27 +72,55 @@ const Game = () => {
   const [displayedText, setDisplayedText] = useState<string>('');
   const [isTyping, setIsTyping] = useState(false);
 
+  // Orientation detection state
+  const [isPortrait, setIsPortrait] = useState(false);
+
+  // Double tap detection for mobile jump
+  const [lastTap, setLastTap] = useState(0);
+  const DOUBLE_TAP_DELAY = 300; // milliseconds
+
+  // Check orientation and mobile device
+  useEffect(() => {
+    const checkOrientation = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const isMobileDevice = width <= 768; // Tailwind md breakpoint
+      const isPortraitMode = height > width;
+
+      setIsPortrait(isPortraitMode && isMobileDevice);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
   // Portfolio dialogue content for each coin
   const DIALOGUE_CONTENT = [
     {
-      title: "Bear's Introduction",
-      text: "Hey! I'm Bear. Did you know Max built an NFT platform for artists to showcase their work? It helps creators monetize their digital art!",
+      title: "Yo, I'm Bear 🐾",
+      text: "I'm the wire-haired chaos goblin you see in the sprite. Max? He's my human. Code wizard, Warhammer nerd, and belly-scratch machine. 10/10 would follow again.",
     },
     {
-      title: 'Technical Skills',
-      text: 'Max is proficient in React, TypeScript, Node.js, and modern web technologies. He loves building full-stack applications!',
+      title: 'Code Alchemist',
+      text: "Max has 10 years of experience building full-stack web apps with React, TypeScript, Node.js, GraphQL, and more. He doesn't just write code — he architects systems.",
     },
     {
-      title: 'Problem Solver',
-      text: "When Max encounters a bug, he doesn't give up! He uses debugging tools, reads documentation, and finds creative solutions.",
+      title: 'Bug Whisperer',
+      text: "When things break (and they do), Max doesn't rage quit — he digs in, traces stack traces, and tames the chaos. Bonus points if it involves a gnarly data migration.",
     },
     {
-      title: 'Team Player',
-      text: 'Max enjoys collaborating with designers, product managers, and other developers. Communication is key to great software!',
+      title: 'Not Just a Lone Wolf',
+      text: "Max knows that great software isn't built in a vacuum. He's worked closely with designers, PMs, and founders — shipping products fast without the BS.",
     },
     {
-      title: 'Continuous Learner',
-      text: 'The tech world moves fast! Max stays current with new frameworks, tools, and best practices through courses and side projects.',
+      title: 'Forever Leveling Up',
+      text: "From Solana smart contracts to real-time multiplayer apps — Max's side projects aren't just hobbies. They're how he keeps his blade sharp in an evolving tech world.",
     },
   ];
 
@@ -534,26 +562,47 @@ const Game = () => {
           return;
         }
 
-        const touch = e.touches[0];
-        const rect = e.currentTarget.getBoundingClientRect();
-        const touchX = touch.clientX - rect.left;
-        const isLeftHalf = touchX < rect.width / 2;
+        const now = Date.now();
+        const timeDiff = now - lastTap;
 
-        // Add movement keys based on touch location
-        keysPressed.current.add(isLeftHalf ? 'a' : 'd');
-        keysPressed.current.add(' '); // Always jump
+        if (timeDiff < DOUBLE_TAP_DELAY && timeDiff > 0) {
+          // Double tap detected - jump!
+          keysPressed.current.add(' ');
+          setLastTap(0); // Reset to prevent triple tap
+        } else {
+          // Single tap - move
+          const touch = e.touches[0];
+          const rect = e.currentTarget.getBoundingClientRect();
+          const touchX = touch.clientX - rect.left;
+          const isLeftHalf = touchX < rect.width / 2;
+
+          keysPressed.current.add(isLeftHalf ? 'a' : 'd');
+          setLastTap(now);
+        }
       }}
       onTouchEnd={e => {
         e.preventDefault();
         if (!isDialogueActive) {
-          // Clear movement keys
+          // Clear movement keys (but not jump, let it complete)
           keysPressed.current.delete('a');
           keysPressed.current.delete('d');
-          keysPressed.current.delete(' ');
         }
       }}
     >
-      {!gameStarted && (
+      {/* Rotate to play message for mobile portrait */}
+      {isPortrait && (
+        <div className="bg-opacity-90 absolute inset-0 z-30 flex flex-col items-center justify-center bg-black">
+          <div className="px-6 text-center">
+            <div className="font-arcade mb-6 animate-pulse text-2xl text-cyan-400">📱➡️📱</div>
+            <div className="font-arcade mb-4 text-lg text-cyan-400">ROTATE TO PLAY</div>
+            <div className="font-arcade max-w-xs text-sm text-cyan-300">
+              This game is best experienced in landscape mode
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!gameStarted && !isPortrait && (
         <div className="bg-opacity-75 absolute inset-0 z-10 flex items-center justify-center bg-black">
           <div className="text-center">
             <div className="font-arcade mb-4 animate-pulse text-2xl text-cyan-400">
@@ -564,10 +613,9 @@ const Game = () => {
         </div>
       )}
 
-      <div className="font-arcade absolute top-2 left-2 text-sm text-cyan-400">
-        Controls: A/D or Arrows to move, Space/W/Up to jump
-        <br />
-        <span className="text-xs">Mobile: Tap left/right half to move & jump</span>
+      <div className="font-arcade absolute top-2 left-2 max-w-xs text-xs text-cyan-400 md:max-w-none md:text-sm">
+        <div className="hidden md:block">Controls: A/D or Arrows to move, Space/W/Up to jump</div>
+        <div className="md:hidden">Tap left/right to move, double-tap to jump</div>
       </div>
       {/* <div className="font-arcade absolute top-6 left-2 text-xs text-cyan-400">
         Position: ({Math.round(position.x)}, {Math.round(position.y)}) | Grounded:{' '}
