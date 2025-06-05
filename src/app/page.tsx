@@ -16,12 +16,13 @@ export default function Home() {
   // };
 
   const COMPANY_LOGOS = [
-    { name: 'fastbreak', src: '/assets/fastbreak.svg', link: 'https://fastbreak.ai' },
     { name: 'planelogix', src: '/assets/planelogix.svg', link: 'https://planelogix.com' },
     { name: 'rhinogram', src: '/assets/rhinogram.svg', link: 'https://rhinogram.com' },
     { name: 'roobet', src: '/assets/roobet.svg', link: 'https://roobet.com' },
     { name: 'vw', src: '/assets/vw.svg', link: 'https://vw.com' },
     { name: 'audi', src: '/assets/audi.svg', link: 'https://audi.com' },
+    { name: 'charleston hacks', src: '/assets/chs_hacks.svg', link: 'https://charlestonhacks.com' },
+    { name: 'microsoft', src: '/assets/microsoft.svg', link: 'https://microsoft.com' },
   ];
 
   return (
@@ -187,11 +188,11 @@ export default function Home() {
                 <div className="flex justify-center pt-4">
                   <a href="https://charlestonhacks.com/" target="_blank" rel="noopener noreferrer">
                     <Image
-                      src="/assets/charleston-hacks.jpeg"
+                      src="/assets/chs_hacks.svg"
                       alt="Charleston Hacks"
                       width={128}
                       height={128}
-                      className="invert"
+                      className="text-purple-300"
                     />
                   </a>
                 </div>
@@ -205,28 +206,25 @@ export default function Home() {
           <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
             <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent
-                onClick={() => window.open('https://commission-marketplace.vercel.app', '_blank')}
+                onClick={() => window.open('https://hackathon-chs.vercel.app/', '_blank')}
                 className="cursor-pointer p-6"
               >
                 <Image
-                  src="/assets/commission-marketplace-preview.png"
-                  alt="Commission Marketplace"
+                  src="/assets/chs_hackathon.png"
+                  alt="Medtech Hackathon"
                   width={512}
                   height={288}
                   className="mb-4 rounded border border-purple-400 shadow-lg"
                 />
                 <h3 className="mb-2 text-xl font-bold text-purple-300">Commission Marketplace</h3>
                 <p className="text-purple-200">
-                  A platform for hiring Warhammer miniature painters. Artists create portfolios,
-                  clients post jobs, and commissions are negotiated with built-in messaging and
-                  milestone tracking.
+                  A hackathon project for Charleston Hacks 2025. We are building a web app that
+                  allows medtech companies to find and hire companies to assist with their projects.
                 </p>
                 <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
                   <li>Built with Next.js, Clerk, and Tailwind</li>
-                  <li>GraphQL Federation via WunderGraph Cosmo</li>
-                  <li>Stripe and escrow-style logic for payments</li>
+                  <li>REST with MCP to deliver a API queryable by AI</li>
                 </ul>
-                <p className="mt-2 text-sm text-cyan-400">Demo coming soon</p>
               </CardContent>
             </Card>
 
@@ -295,7 +293,7 @@ export default function Home() {
                   key={company.name}
                   src={company.src}
                   alt={`${company.name} logo`}
-                  className="h-32 w-32 object-contain opacity-60 invert transition-all hover:opacity-100"
+                  className="h-32 w-32 object-contain opacity-60 brightness-0 invert transition-all hover:opacity-100"
                   width={128}
                   height={128}
                 />
@@ -320,7 +318,7 @@ export default function Home() {
               rel="noopener noreferrer"
             >
               <Image
-                className="invert"
+                className="brightness-0 invert"
                 src="/assets/linkedin.svg"
                 alt="Linkedin"
                 width={32}
