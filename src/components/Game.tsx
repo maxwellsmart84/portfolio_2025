@@ -760,8 +760,14 @@ const Game = () => {
         const timeDiff = now - lastTap;
 
         if (timeDiff < DOUBLE_TAP_DELAY && timeDiff > 0) {
-          // Double tap detected - jump!
-          keysPressed.current.add(' ');
+          // Double tap detected - jump once!
+          if (isGrounded) {
+            keysPressed.current.add(' ');
+            // Remove jump key after a brief delay to prevent stuck jumping
+            setTimeout(() => {
+              keysPressed.current.delete(' ');
+            }, 50);
+          }
           setLastTap(0); // Reset to prevent triple tap
         } else {
           // Single tap - move
@@ -777,9 +783,10 @@ const Game = () => {
       onTouchEnd={e => {
         e.preventDefault();
         if (!isDialogueActive) {
-          // Clear movement keys (but not jump, let it complete)
+          // Clear movement keys and jump key
           keysPressed.current.delete('a');
           keysPressed.current.delete('d');
+          keysPressed.current.delete(' ');
         }
       }}
     >
