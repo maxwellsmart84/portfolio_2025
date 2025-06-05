@@ -79,6 +79,20 @@ const Game = () => {
   const [lastTap, setLastTap] = useState(0);
   const DOUBLE_TAP_DELAY = 300; // milliseconds
 
+  // Celebration state for end game
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [tennisBalls, setTennisBalls] = useState<
+    Array<{
+      id: number;
+      x: number;
+      y: number;
+      velocityX: number;
+      velocityY: number;
+      rotation: number;
+      rotationSpeed: number;
+    }>
+  >([]);
+
   // Check orientation and mobile device
   useEffect(() => {
     const checkOrientation = () => {
@@ -121,6 +135,10 @@ const Game = () => {
     {
       title: 'Forever Leveling Up',
       text: "From Solana smart contracts to real-time multiplayer apps — Max's side projects aren't just hobbies. They're how he keeps his blade sharp in an evolving tech world.",
+    },
+    {
+      title: 'Thank you for playing!',
+      text: 'I hope you enjoyed the game! If you want to reach out, you can find me on LinkedIn or email me: max@maxwell.dev.',
     },
   ];
 
@@ -483,11 +501,9 @@ const Game = () => {
               setCurrentDialogue(DIALOGUE_CONTENT[0].text);
               setIsDialogueActive(true);
             } else if (totalCoinsCollected === 6) {
-              // Last coin collected - static thanks for playing
-              setDialogueTitle('Thanks for Playing!');
-              setCurrentDialogue(
-                "Thanks for checking out this portfolio game! Max built this with React, PIXI.js, and Aseprite. Want to work together? Let's chat!"
-              );
+              // Last coin collected - use dialogue content
+              setDialogueTitle(DIALOGUE_CONTENT[5].title);
+              setCurrentDialogue(DIALOGUE_CONTENT[5].text);
               setIsDialogueActive(true);
             } else if (DIALOGUE_CONTENT[totalCoinsCollected - 1]) {
               // Middle coins (2-5) use content from array
@@ -540,8 +556,186 @@ const Game = () => {
       if (gameContainerRef.current) {
         gameContainerRef.current.focus();
       }
+
+      // Check if we just finished the final dialogue (all coins collected)
+      if (collectedCoins.size === 6) {
+        setIsCelebrating(true);
+        // Start tennis ball rain!
+        const ballCount = 60; // Increased from 20 to 60
+        const newBalls = Array.from({ length: ballCount }, (_, i) => ({
+          id: i,
+          x: Math.random() * appSize.width,
+          y: -50 - Math.random() * 200, // Start above screen
+          velocityX: (Math.random() - 0.5) * 8, // Random horizontal velocity
+          velocityY: Math.random() * 3 + 2, // Downward velocity
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.3,
+        }));
+        setTennisBalls(newBalls);
+      }
     }
-  }, [isDialogueActive]);
+  }, [isDialogueActive, collectedCoins.size, appSize.width]);
+
+  // Tennis ball physics animation
+  useEffect(() => {
+    if (!isCelebrating) return;
+
+    // Helper function to check ball collision with platforms
+    const checkBallPlatformCollision = (ball: {
+      id: number;
+      x: number;
+      y: number;
+      velocityX: number;
+      velocityY: number;
+      rotation: number;
+      rotationSpeed: number;
+    }) => {
+      const ballRadius = 8; // Tennis ball radius
+      const newBall = { ...ball };
+
+      for (const platform of PLATFORMS) {
+        // Check if ball is near the platform
+        const ballLeft = ball.x - ballRadius;
+        const ballRight = ball.x + ballRadius;
+        const ballTop = ball.y - ballRadius;
+        const ballBottom = ball.y + ballRadius;
+
+        // Check horizontal overlap
+        if (ballRight > platform.x && ballLeft < platform.x + platform.width) {
+          // Check if ball is landing on top of platform
+          if (
+            ball.velocityY > 0 && // Ball is moving downward
+            ballBottom >= platform.y &&
+            ballBottom <= platform.y + platform.height + 5 && // Small buffer for collision detection
+            ballTop < platform.y
+          ) {
+            // Bounce off top of platform
+            newBall.y = platform.y - ballRadius;
+            newBall.velocityY = -Math.abs(ball.velocityY) * 0.7; // Bounce with energy loss
+            newBall.rotationSpeed = newBall.rotationSpeed * 0.8;
+            break;
+          }
+          // Check if ball hits bottom of platform
+          else if (
+            ball.velocityY < 0 && // Ball is moving upward
+            ballTop <= platform.y + platform.height &&
+            ballTop >= platform.y - 5 &&
+            ballBottom > platform.y + platform.height
+          ) {
+            // Bounce off bottom of platform
+            newBall.y = platform.y + platform.height + ballRadius;
+            newBall.velocityY = Math.abs(ball.velocityY) * 0.7;
+            newBall.rotationSpeed = newBall.rotationSpeed * 0.8;
+            break;
+          }
+        }
+
+        // Check vertical overlap for side collisions
+        if (ballBottom > platform.y && ballTop < platform.y + platform.height) {
+          // Check if ball hits left side of platform
+          if (
+            ball.velocityX > 0 && // Ball is moving right
+            ballRight >= platform.x &&
+            ballRight <= platform.x + 5 &&
+            ballLeft < platform.x
+          ) {
+            newBall.x = platform.x - ballRadius;
+            newBall.velocityX = -Math.abs(ball.velocityX) * 0.8;
+            break;
+          }
+          // Check if ball hits right side of platform
+          else if (
+            ball.velocityX < 0 && // Ball is moving left
+            ballLeft <= platform.x + platform.width &&
+            ballLeft >= platform.x + platform.width - 5 &&
+            ballRight > platform.x + platform.width
+          ) {
+            newBall.x = platform.x + platform.width + ballRadius;
+            newBall.velocityX = Math.abs(ball.velocityX) * 0.8;
+            break;
+          }
+        }
+      }
+
+      return newBall;
+    };
+
+    const animateBalls = () => {
+      setTennisBalls(
+        prevBalls =>
+          prevBalls
+            .map(ball => {
+              // Apply basic physics first
+              let newBall = {
+                ...ball,
+                x: ball.x + ball.velocityX,
+                y: ball.y + ball.velocityY,
+                velocityY: ball.velocityY + 0.2, // Gravity
+                velocityX: ball.velocityX * 0.999, // Air resistance
+                rotation: ball.rotation + ball.rotationSpeed,
+              };
+
+              // Check platform collisions
+              newBall = checkBallPlatformCollision(newBall);
+
+              // Bounce off sides
+              if (newBall.x <= 8 || newBall.x >= appSize.width - 8) {
+                newBall.velocityX = -newBall.velocityX * 0.8;
+                newBall.x = Math.max(8, Math.min(appSize.width - 8, newBall.x));
+              }
+
+              // Bounce off ground (y = 280 is ground level)
+              if (newBall.y >= 280 - 8) {
+                newBall.velocityY = -Math.abs(newBall.velocityY) * 0.7;
+                newBall.y = 280 - 8;
+                newBall.rotationSpeed = newBall.rotationSpeed * 0.8;
+              }
+
+              return newBall;
+            })
+            .filter(ball => ball.y < 400) // Remove balls that fall too far
+      );
+    };
+
+    const interval = setInterval(animateBalls, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, [isCelebrating, appSize.width]);
+
+  // Function to reset game to beginning
+  const resetGame = () => {
+    // Reset character position and physics
+    setPosition({ x: 100, y: GROUND_Y });
+    setVelocity({ x: 0, y: 0 });
+    setIsMoving(false);
+    setFacingRight(true);
+    setIsGrounded(true);
+
+    // Reset camera
+    setCameraX(0);
+
+    // Reset coin collection and score
+    setCollectedCoins(new Set());
+    setScore(0);
+
+    // Reset dialogue state
+    setIsDialogueActive(false);
+    setCurrentDialogue('');
+    setDialogueTitle('');
+    setDisplayedText('');
+    setIsTyping(false);
+
+    // Reset celebration state
+    setIsCelebrating(false);
+    setTennisBalls([]);
+
+    // Clear any pressed keys
+    keysPressed.current.clear();
+
+    // Return focus to game
+    if (gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
+  };
 
   return (
     <div
@@ -624,6 +818,16 @@ const Game = () => {
       <div className="font-arcade absolute top-12 left-2 text-xs text-cyan-400">
         Score: {score} | Coins: {collectedCoins.size}/{COIN_POSITIONS.length}
       </div>
+
+      {/* Play Again Button - appears during celebration */}
+      {isCelebrating && (
+        <button
+          onClick={resetGame}
+          className="font-arcade bg-opacity-80 absolute top-2 right-2 z-10 rounded border-2 border-cyan-400 bg-black px-4 py-2 text-sm text-cyan-400 transition-all hover:bg-cyan-400 hover:text-black focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+        >
+          🎮 PLAY AGAIN
+        </button>
+      )}
 
       {/* Final Fantasy Style Dialogue Box */}
       {isDialogueActive && (
@@ -725,6 +929,35 @@ const Game = () => {
                 scale={{ x: facingRight ? 2 : -2, y: 2 }}
               />
             )}
+
+          {/* Tennis ball celebration rain */}
+          {isCelebrating &&
+            tennisBalls.map(ball => (
+              <pixiGraphics
+                key={`tennis-ball-${ball.id}`}
+                x={ball.x}
+                y={ball.y}
+                rotation={ball.rotation}
+                draw={(graphics: PIXI.Graphics) => {
+                  graphics.clear();
+                  // Tennis ball body (yellow-green)
+                  graphics.circle(0, 0, 8);
+                  graphics.fill({ color: 0x9acd32 });
+
+                  // Tennis ball lines (white)
+                  graphics.moveTo(-8, 0);
+                  graphics.arcTo(0, -4, 8, 0, 4);
+                  graphics.arcTo(0, 4, -8, 0, 4);
+                  graphics.stroke({ color: 0xffffff, width: 1 });
+
+                  // Second curve
+                  graphics.moveTo(-8, 0);
+                  graphics.arcTo(0, 4, 8, 0, 4);
+                  graphics.arcTo(0, -4, -8, 0, 4);
+                  graphics.stroke({ color: 0xffffff, width: 1 });
+                }}
+              />
+            ))}
         </pixiContainer>
       </Application>
     </div>
