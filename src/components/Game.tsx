@@ -42,7 +42,7 @@ const Game = () => {
   const [idleTextures, setIdleTextures] = useState<PIXI.Texture[]>([]);
   const [jumpTextures, setJumpTextures] = useState<PIXI.Texture[]>([]);
   const [coinTextures, setCoinTextures] = useState<PIXI.Texture[]>([]);
-  const [appSize, setAppSize] = useState({ width: 5000, height: 300 });
+  const [appSize] = useState({ width: 5000, height: 300 });
   const [isLoading, setIsLoading] = useState(true);
 
   // Movement state
@@ -75,10 +75,8 @@ const Game = () => {
   // Orientation detection state
   const [isPortrait, setIsPortrait] = useState(false);
 
-  // Double tap detection for mobile jump
-  const [lastTap, setLastTap] = useState(0);
-  const DOUBLE_TAP_DELAY = 300; // milliseconds
-  const touchKeysRef = useRef<Set<string>>(new Set());
+  // Mobile device detection
+  const [isMobile, setIsMobile] = useState(false);
 
   // Celebration state for end game
   const [isCelebrating, setIsCelebrating] = useState(false);
@@ -103,14 +101,7 @@ const Game = () => {
       const isPortraitMode = height > width;
 
       setIsPortrait(isPortraitMode && isMobileDevice);
-
-      // Update app size based on orientation
-      if (isPortraitMode && isMobileDevice) {
-        setAppSize({ width: 5000, height: 300 }); // Smaller height for portrait
-      } else {
-        const gameHeight = Math.min(Math.floor(height * 0.7), 500);
-        setAppSize({ width: 5000, height: Math.max(gameHeight, 300) }); // Taller for landscape
-      }
+      setIsMobile(isMobileDevice);
     };
 
     checkOrientation();
@@ -750,75 +741,8 @@ const Game = () => {
     <div
       ref={gameContainerRef}
       className="relative w-full overflow-hidden rounded-xl border border-cyan-500 bg-black shadow-[0_0_20px_cyan] focus:outline-none"
-      style={{
-        height: isPortrait ? '300px' : 'min(70vh, 500px)', // Taller in landscape
-        minHeight: '300px',
-      }}
       tabIndex={0}
       onClick={handleGameStart}
-      onTouchStart={e => {
-        e.preventDefault();
-        if (isDialogueActive) {
-          // Handle dialogue on touch
-          if (isTyping) {
-            setDisplayedText(currentDialogue);
-            setIsTyping(false);
-          } else {
-            setIsDialogueActive(false);
-          }
-          return;
-        }
-
-        const touch = e.touches[0];
-        const rect = e.currentTarget.getBoundingClientRect();
-        const touchX = touch.clientX - rect.left;
-        const isLeftHalf = touchX < rect.width / 2;
-
-        const now = Date.now();
-        const timeDiff = now - lastTap;
-
-        if (timeDiff < DOUBLE_TAP_DELAY && timeDiff > 0) {
-          // Double tap detected - jump AND set direction!
-          if (isGrounded) {
-            keysPressed.current.add(' ');
-            // Remove jump key after a brief delay to prevent stuck jumping
-            setTimeout(() => {
-              keysPressed.current.delete(' ');
-            }, 50);
-          }
-
-          // Also set movement direction for air control
-          touchKeysRef.current.clear();
-          touchKeysRef.current.add(isLeftHalf ? 'a' : 'd');
-          keysPressed.current.delete('a');
-          keysPressed.current.delete('d');
-          keysPressed.current.add(isLeftHalf ? 'a' : 'd');
-
-          setLastTap(0); // Reset to prevent triple tap
-        } else {
-          // Single tap - move (works both on ground and in air)
-          touchKeysRef.current.clear();
-          touchKeysRef.current.add(isLeftHalf ? 'a' : 'd');
-          keysPressed.current.delete('a');
-          keysPressed.current.delete('d');
-          keysPressed.current.add(isLeftHalf ? 'a' : 'd');
-          setLastTap(now);
-        }
-      }}
-      onTouchEnd={e => {
-        e.preventDefault();
-        if (!isDialogueActive) {
-          // Only clear keys that were set by touch
-          setTimeout(() => {
-            touchKeysRef.current.forEach(key => {
-              keysPressed.current.delete(key);
-            });
-            touchKeysRef.current.clear();
-          }, 100);
-          // Clear jump key immediately (always safe since it's momentary)
-          keysPressed.current.delete(' ');
-        }
-      }}
     >
       {/* Rotate to play message for mobile portrait */}
       {isPortrait && (
@@ -846,7 +770,7 @@ const Game = () => {
 
       <div className="font-arcade absolute top-2 left-2 max-w-xs text-xs text-cyan-400 md:max-w-none md:text-sm">
         <div className="hidden md:block">Controls: A/D or Arrows to move, Space/W/Up to jump</div>
-        <div className="md:hidden">Tap left/right to move, double-tap to jump</div>
+        <div className="md:hidden">Use virtual gamepad to play</div>
       </div>
       {/* <div className="font-arcade absolute top-6 left-2 text-xs text-cyan-400">
         Position: ({Math.round(position.x)}, {Math.round(position.y)}) | Grounded:{' '}
@@ -864,6 +788,91 @@ const Game = () => {
         >
           🎮 PLAY AGAIN
         </button>
+      )}
+
+      {/* Virtual Gamepad for Mobile */}
+      {isMobile && !isPortrait && gameStarted && !isDialogueActive && (
+        <div className="absolute right-0 bottom-4 left-0 z-10 flex justify-between px-4">
+          {/* D-Pad */}
+          <div className="relative">
+            <div className="grid grid-cols-3 gap-1">
+              {/* Empty top-left */}
+              <div></div>
+              {/* Up button - not needed for this game */}
+              <div></div>
+              {/* Empty top-right */}
+              <div></div>
+
+              {/* Left button */}
+              <button
+                className="bg-opacity-80 h-12 w-12 rounded border-2 border-cyan-400 bg-black text-cyan-400 transition-all focus:outline-none active:bg-cyan-400 active:text-black"
+                onTouchStart={e => {
+                  e.preventDefault();
+                  keysPressed.current.add('a');
+                }}
+                onTouchEnd={e => {
+                  e.preventDefault();
+                  keysPressed.current.delete('a');
+                }}
+                onMouseDown={() => keysPressed.current.add('a')}
+                onMouseUp={() => keysPressed.current.delete('a')}
+                onMouseLeave={() => keysPressed.current.delete('a')}
+              >
+                ←
+              </button>
+
+              {/* Center - empty */}
+              <div></div>
+
+              {/* Right button */}
+              <button
+                className="bg-opacity-80 h-12 w-12 rounded border-2 border-cyan-400 bg-black text-cyan-400 transition-all focus:outline-none active:bg-cyan-400 active:text-black"
+                onTouchStart={e => {
+                  e.preventDefault();
+                  keysPressed.current.add('d');
+                }}
+                onTouchEnd={e => {
+                  e.preventDefault();
+                  keysPressed.current.delete('d');
+                }}
+                onMouseDown={() => keysPressed.current.add('d')}
+                onMouseUp={() => keysPressed.current.delete('d')}
+                onMouseLeave={() => keysPressed.current.delete('d')}
+              >
+                →
+              </button>
+
+              {/* Empty bottom row */}
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+
+          {/* Jump Button */}
+          <button
+            className="font-arcade bg-opacity-80 h-14 w-20 rounded-full border-2 border-cyan-400 bg-black text-sm text-cyan-400 transition-all focus:outline-none active:bg-cyan-400 active:text-black"
+            onTouchStart={e => {
+              e.preventDefault();
+              if (isGrounded) {
+                keysPressed.current.add(' ');
+              }
+            }}
+            onTouchEnd={e => {
+              e.preventDefault();
+              keysPressed.current.delete(' ');
+            }}
+            onMouseDown={() => {
+              if (isGrounded) {
+                keysPressed.current.add(' ');
+              }
+            }}
+            onMouseUp={() => keysPressed.current.delete(' ')}
+            onMouseLeave={() => keysPressed.current.delete(' ')}
+          >
+            JUMP
+          </button>
+        </div>
       )}
 
       {/* Final Fantasy Style Dialogue Box */}
