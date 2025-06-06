@@ -894,6 +894,28 @@ const Game = () => {
               }
             }
           }}
+          onTouchStart={e => {
+            e.preventDefault();
+            if (isTyping) {
+              // Skip typing animation
+              setDisplayedText(currentDialogue);
+              setIsTyping(false);
+            } else {
+              // Close dialogue
+              setIsDialogueActive(false);
+            }
+          }}
+          onClick={e => {
+            e.preventDefault();
+            if (isTyping) {
+              // Skip typing animation
+              setDisplayedText(currentDialogue);
+              setIsTyping(false);
+            } else {
+              // Close dialogue
+              setIsDialogueActive(false);
+            }
+          }}
           style={{ outline: 'none' }}
         >
           <div className="relative mx-4 max-w-2xl rounded-lg border-4 border-gray-300 bg-blue-800 p-6">
