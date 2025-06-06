@@ -95,7 +95,7 @@ export default function Home() {
               View Projects
             </Button>
             <Button
-              onClick={() => window.open('mailto:maxwell.l.krause@gmail.com', '_blank')}
+              onClick={() => window.open('mailto:max@maxwellk.dev', '_blank')}
               variant="outline"
               className="border-purple-400 text-purple-400 hover:bg-purple-800"
             >
