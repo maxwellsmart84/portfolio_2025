@@ -216,7 +216,7 @@ export default function Home() {
                   height={288}
                   className="mb-4 rounded border border-purple-400 shadow-lg"
                 />
-                <h3 className="mb-2 text-xl font-bold text-purple-300">Commission Marketplace</h3>
+                <h3 className="mb-2 text-xl font-bold text-purple-300">Medtech Hackathon</h3>
                 <p className="text-purple-200">
                   A hackathon project for Charleston Hacks 2025. We are building a web app that
                   allows medtech companies to find and hire companies to assist with their projects.
