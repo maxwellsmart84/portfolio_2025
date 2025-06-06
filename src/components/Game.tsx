@@ -42,7 +42,7 @@ const Game = () => {
   const [idleTextures, setIdleTextures] = useState<PIXI.Texture[]>([]);
   const [jumpTextures, setJumpTextures] = useState<PIXI.Texture[]>([]);
   const [coinTextures, setCoinTextures] = useState<PIXI.Texture[]>([]);
-  const [appSize] = useState({ width: 5000, height: 300 });
+  const [appSize, setAppSize] = useState({ width: 5000, height: 300 });
   const [isLoading, setIsLoading] = useState(true);
 
   // Movement state
@@ -102,6 +102,15 @@ const Game = () => {
 
       setIsPortrait(isPortraitMode && isMobileDevice);
       setIsMobile(isMobileDevice);
+
+      // Adjust viewport width for better mobile experience
+      if (isMobileDevice && !isPortraitMode) {
+        // Mobile landscape: show more of the world (zoom out effect)
+        setAppSize({ width: Math.min(window.innerWidth * 1.8, 6500), height: 300 });
+      } else {
+        // Desktop or mobile portrait: keep original view
+        setAppSize({ width: 5000, height: 300 });
+      }
     };
 
     checkOrientation();
