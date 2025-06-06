@@ -65,7 +65,7 @@ export default function Home() {
             whileTap={{ scale: 0.95 }}
             //  className="bg-cyan-500 hover:bg-cyan-400 shadow-[0_0_10px_cyan] text-white font-bold py-2 px-4 rounded"
           >
-            <h1 className="mt-14 mb-14 rounded-md border-2 border-purple-400 p-8 text-5xl font-bold text-cyan-400 outline-4 outline-offset-[1rem] outline-purple-400 drop-shadow-[0_0_15px_cyan] md:text-7xl">
+            <h1 className="mt-14 mb-14 rounded-md border-2 border-purple-400 p-8 text-5xl font-bold text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-7xl md:outline-4 md:outline-offset-[1rem] md:outline-purple-400">
               Maxwell Krause
             </h1>
           </motion.button>
