@@ -216,10 +216,11 @@ export default function Home() {
                   height={288}
                   className="mb-4 rounded border border-purple-400 shadow-lg"
                 />
-                <h3 className="mb-2 text-xl font-bold text-purple-300">Medtech Hackathon</h3>
+                <h3 className="mb-2 text-xl font-bold text-purple-300">MedTech Hackathon</h3>
                 <p className="text-purple-200">
                   A hackathon project for Charleston Hacks 2025. We are building a web app that
-                  allows medtech companies to find and hire companies to assist with their projects.
+                  allows medical technology companies to find and hire companies to assist with
+                  their projects.
                 </p>
                 <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
                   <li>Built with Next.js, Clerk, and Tailwind</li>
@@ -306,11 +307,17 @@ export default function Home() {
           <h2 className="mb-6 text-3xl text-cyan-400">Contact</h2>
           <p className="mb-4 text-purple-200">Got a project or just want to talk Warhammer?</p>
           <a href="mailto:max@example.com" className="text-cyan-300 underline hover:text-cyan-100">
-            maxwell.l.krause@gmail.com
+            max@maxwellk.dev
           </a>
           <div className="flex justify-center gap-4 pt-2">
-            <a href="https://github.com/maxwellkrause" target="_blank" rel="noopener noreferrer">
-              <Image src="/assets/github.svg" alt="Github" width={32} height={32} />
+            <a href="https://github.com/maxwellsmart84" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/assets/github.svg"
+                alt="Github"
+                className="brightness-0 invert"
+                width={32}
+                height={32}
+              />
             </a>
             <a
               href="https://www.linkedin.com/in/maxwell-krause/"
