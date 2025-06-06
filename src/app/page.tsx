@@ -105,7 +105,7 @@ export default function Home() {
         </section>
 
         <section id="game" className="px-4 py-12 text-center">
-          <div className="mx-auto flex w-2/3 justify-center">
+          <div className="mx-auto flex justify-center md:w-2/3">
             <Game />
           </div>
         </section>
@@ -115,7 +115,7 @@ export default function Home() {
 
         <section id="community" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Community & Mentorship</h2>
-          <div className="mx-auto flex w-2/3 flex-col gap-8">
+          <div className="mx-auto flex flex-col gap-8 md:w-2/3">
             <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent>
                 <div className="mx-auto flex items-center justify-center gap-4">
@@ -286,7 +286,7 @@ export default function Home() {
         </section>
         <section id="trusted-by" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Trusted By</h2>
-          <div className="mx-auto flex flex-wrap items-center justify-center gap-12">
+          <div className="mx-auto flex flex-wrap items-center justify-center gap-4 md:gap-12">
             {COMPANY_LOGOS.map(company => (
               <a key={company.name} href={company.link} target="_blank" rel="noopener noreferrer">
                 <Image
