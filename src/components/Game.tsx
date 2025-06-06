@@ -78,6 +78,7 @@ const Game = () => {
   // Double tap detection for mobile jump
   const [lastTap, setLastTap] = useState(0);
   const DOUBLE_TAP_DELAY = 300; // milliseconds
+  const touchKeysRef = useRef<Set<string>>(new Set());
 
   // Celebration state for end game
   const [isCelebrating, setIsCelebrating] = useState(false);
@@ -756,11 +757,16 @@ const Game = () => {
           return;
         }
 
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const isLeftHalf = touchX < rect.width / 2;
+
         const now = Date.now();
         const timeDiff = now - lastTap;
 
         if (timeDiff < DOUBLE_TAP_DELAY && timeDiff > 0) {
-          // Double tap detected - jump once!
+          // Double tap detected - jump AND set direction!
           if (isGrounded) {
             keysPressed.current.add(' ');
             // Remove jump key after a brief delay to prevent stuck jumping
@@ -768,14 +774,21 @@ const Game = () => {
               keysPressed.current.delete(' ');
             }, 50);
           }
+
+          // Also set movement direction for air control
+          touchKeysRef.current.clear();
+          touchKeysRef.current.add(isLeftHalf ? 'a' : 'd');
+          keysPressed.current.delete('a');
+          keysPressed.current.delete('d');
+          keysPressed.current.add(isLeftHalf ? 'a' : 'd');
+
           setLastTap(0); // Reset to prevent triple tap
         } else {
-          // Single tap - move
-          const touch = e.touches[0];
-          const rect = e.currentTarget.getBoundingClientRect();
-          const touchX = touch.clientX - rect.left;
-          const isLeftHalf = touchX < rect.width / 2;
-
+          // Single tap - move (works both on ground and in air)
+          touchKeysRef.current.clear();
+          touchKeysRef.current.add(isLeftHalf ? 'a' : 'd');
+          keysPressed.current.delete('a');
+          keysPressed.current.delete('d');
           keysPressed.current.add(isLeftHalf ? 'a' : 'd');
           setLastTap(now);
         }
@@ -783,9 +796,14 @@ const Game = () => {
       onTouchEnd={e => {
         e.preventDefault();
         if (!isDialogueActive) {
-          // Clear movement keys and jump key
-          keysPressed.current.delete('a');
-          keysPressed.current.delete('d');
+          // Only clear keys that were set by touch
+          setTimeout(() => {
+            touchKeysRef.current.forEach(key => {
+              keysPressed.current.delete(key);
+            });
+            touchKeysRef.current.clear();
+          }, 100);
+          // Clear jump key immediately (always safe since it's momentary)
           keysPressed.current.delete(' ');
         }
       }}

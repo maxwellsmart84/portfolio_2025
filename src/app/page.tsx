@@ -154,7 +154,7 @@ export default function Home() {
                       alt="Microsoft"
                       width={128}
                       height={128}
-                      className="text-purple-300"
+                      className="invert"
                     />
                   </a>
                 </div>
@@ -192,7 +192,7 @@ export default function Home() {
                       alt="Charleston Hacks"
                       width={128}
                       height={128}
-                      className="text-purple-300"
+                      className="invert"
                     />
                   </a>
                 </div>
