@@ -19,9 +19,31 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: 'Maxwell Krause | Software Engineer',
+  title: 'Maxwell Krause | Full-Stack Developer',
   description:
-    'Maxwell Krause is a software engineer with a passion for building products that help people live better lives.',
+    'Synthwave-coded, full-stack engineered. Portfolio, projects, and Warhammer goodness.',
+  openGraph: {
+    title: 'Maxwell Krause | Full-Stack Developer',
+    description:
+      'Synthwave-coded, full-stack engineered. Portfolio, projects, and Warhammer goodness.',
+    url: 'https://maxwellk.dev',
+    siteName: 'maxwellk.dev',
+    images: [
+      {
+        url: '/og-image.png', // Direct in public folder
+        width: 1200,
+        height: 630,
+        alt: 'Maxwell Krause Portfolio Banner',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Maxwell Krause',
+    description: 'Check out my synthwave-coded portfolio.',
+    images: ['/og-image.png'],
+  },
 };
 
 export default function RootLayout({
