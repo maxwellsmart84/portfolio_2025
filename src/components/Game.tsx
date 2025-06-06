@@ -42,7 +42,7 @@ const Game = () => {
   const [idleTextures, setIdleTextures] = useState<PIXI.Texture[]>([]);
   const [jumpTextures, setJumpTextures] = useState<PIXI.Texture[]>([]);
   const [coinTextures, setCoinTextures] = useState<PIXI.Texture[]>([]);
-  const [appSize] = useState({ width: 5000, height: 300 });
+  const [appSize, setAppSize] = useState({ width: 5000, height: 300 });
   const [isLoading, setIsLoading] = useState(true);
 
   // Movement state
@@ -103,6 +103,14 @@ const Game = () => {
       const isPortraitMode = height > width;
 
       setIsPortrait(isPortraitMode && isMobileDevice);
+
+      // Update app size based on orientation
+      if (isPortraitMode && isMobileDevice) {
+        setAppSize({ width: 5000, height: 300 }); // Smaller height for portrait
+      } else {
+        const gameHeight = Math.min(Math.floor(height * 0.7), 500);
+        setAppSize({ width: 5000, height: Math.max(gameHeight, 300) }); // Taller for landscape
+      }
     };
 
     checkOrientation();
@@ -742,6 +750,10 @@ const Game = () => {
     <div
       ref={gameContainerRef}
       className="relative w-full overflow-hidden rounded-xl border border-cyan-500 bg-black shadow-[0_0_20px_cyan] focus:outline-none"
+      style={{
+        height: isPortrait ? '300px' : 'min(70vh, 500px)', // Taller in landscape
+        minHeight: '300px',
+      }}
       tabIndex={0}
       onClick={handleGameStart}
       onTouchStart={e => {
