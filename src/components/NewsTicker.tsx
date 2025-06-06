@@ -24,6 +24,17 @@ const formatDate = (unixTimestamp: number) => {
 
 const NewsTicker: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchTopStories = async () => {
@@ -59,7 +70,7 @@ const NewsTicker: React.FC = () => {
         className="flex whitespace-nowrap"
         animate={{ x: ['100%', '-100%'] }}
         transition={{
-          duration: 40,
+          duration: isMobile ? 15 : 40, // Faster on mobile
           repeat: Infinity,
           ease: 'linear',
         }}
