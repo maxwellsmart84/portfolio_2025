@@ -4,6 +4,7 @@ import Game from '@/components/Game';
 import LaserLightLayer from '@/components/LaserLight';
 import NewsTicker from '@/components/NewsTicker';
 import PriceChart from '@/components/PriceChart';
+import SynthControls from '@/components/SynthControls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -109,9 +110,9 @@ export default function Home() {
             <Game />
           </div>
         </section>
-        {/* <section id="synth" className="px-4 py-12 text-center">
+        <section id="synth" className="px-4 py-12 text-center">
           <SynthControls />
-        </section> */}
+        </section>
 
         <section id="community" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Community & Mentorship</h2>
@@ -306,7 +307,7 @@ export default function Home() {
         <section id="contact" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Contact</h2>
           <p className="mb-4 text-purple-200">Got a project or just want to talk Warhammer?</p>
-          <a href="mailto:max@example.com" className="text-cyan-300 underline hover:text-cyan-100">
+          <a href="mailto:max@maxwellk.dev" className="text-cyan-300 underline hover:text-cyan-100">
             max@maxwellk.dev
           </a>
           <div className="flex justify-center gap-4 pt-2">
