@@ -111,6 +111,58 @@ export default function Home() {
         <section id="synth" className="px-4 py-12 text-center">
           <SynthControls />
         </section> */}
+        <section id="projects" className="px-4 py-12 text-center">
+          <h2 className="mb-10 text-3xl text-cyan-400">Projects</h2>
+          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
+            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+              <CardContent
+                onClick={() => window.open('https://hackathon-chs.vercel.app/', '_blank')}
+                className="cursor-pointer p-6"
+              >
+                <Image
+                  src="/assets/chs_hackathon.png"
+                  alt="Medtech Hackathon"
+                  width={512}
+                  height={288}
+                  className="mb-4 rounded border border-purple-400 shadow-lg"
+                />
+                <h3 className="mb-2 text-xl font-bold text-purple-300">MedTech Hackathon</h3>
+                <p className="text-purple-200">
+                  A hackathon project for Charleston Hacks 2025. We are building a web app that
+                  allows medical technology companies to find and hire companies to assist with
+                  their projects.
+                </p>
+                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
+                  <li>Built with Next.js, Clerk, and Tailwind</li>
+                  <li>REST with MCP to deliver a API queryable by AI</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+              <CardContent className="p-6">
+                <Image
+                  src="/assets/challenger-app.png"
+                  alt="Challenge App"
+                  width={512}
+                  height={288}
+                  className="mb-4 rounded border border-purple-400 shadow-lg"
+                />
+                <h3 className="mb-2 text-xl font-bold text-purple-300">Challenge App</h3>
+                <p className="text-purple-200">
+                  A proximity-based mobile-friendly web app to find and play 1v1 tabletop matches.
+                  Designed for in-store pickup games and local leagues.
+                </p>
+                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
+                  <li>Real-time location & matchmaking with Firebase</li>
+                  <li>PlanetScale + Drizzle ORM schema for user inventory</li>
+                  <li>Push notifications and real-time updates with Pusher</li>
+                </ul>
+                <p className="mt-2 text-sm text-cyan-400">Demo coming soon</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
 
         <section id="community" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Community & Mentorship</h2>
@@ -195,59 +247,6 @@ export default function Home() {
                     />
                   </a>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section id="projects" className="px-4 py-12 text-center">
-          <h2 className="mb-10 text-3xl text-cyan-400">Projects</h2>
-          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
-            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
-              <CardContent
-                onClick={() => window.open('https://hackathon-chs.vercel.app/', '_blank')}
-                className="cursor-pointer p-6"
-              >
-                <Image
-                  src="/assets/chs_hackathon.png"
-                  alt="Medtech Hackathon"
-                  width={512}
-                  height={288}
-                  className="mb-4 rounded border border-purple-400 shadow-lg"
-                />
-                <h3 className="mb-2 text-xl font-bold text-purple-300">MedTech Hackathon</h3>
-                <p className="text-purple-200">
-                  A hackathon project for Charleston Hacks 2025. We are building a web app that
-                  allows medical technology companies to find and hire companies to assist with
-                  their projects.
-                </p>
-                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
-                  <li>Built with Next.js, Clerk, and Tailwind</li>
-                  <li>REST with MCP to deliver a API queryable by AI</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
-              <CardContent className="p-6">
-                <Image
-                  src="/assets/challenger-app.png"
-                  alt="Challenge App"
-                  width={512}
-                  height={288}
-                  className="mb-4 rounded border border-purple-400 shadow-lg"
-                />
-                <h3 className="mb-2 text-xl font-bold text-purple-300">Challenge App</h3>
-                <p className="text-purple-200">
-                  A proximity-based mobile-friendly web app to find and play 1v1 tabletop matches.
-                  Designed for in-store pickup games and local leagues.
-                </p>
-                <ul className="mt-2 list-disc pl-4 text-left text-sm text-purple-200">
-                  <li>Real-time location & matchmaking with Firebase</li>
-                  <li>PlanetScale + Drizzle ORM schema for user inventory</li>
-                  <li>Push notifications and real-time updates with Pusher</li>
-                </ul>
-                <p className="mt-2 text-sm text-cyan-400">Demo coming soon</p>
               </CardContent>
             </Card>
           </div>
