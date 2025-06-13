@@ -1,10 +1,8 @@
 'use client';
 
-import Game from '@/components/Game';
 import LaserLightLayer from '@/components/LaserLight';
 import NewsTicker from '@/components/NewsTicker';
 import PriceChart from '@/components/PriceChart';
-import SynthControls from '@/components/SynthControls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -105,14 +103,14 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="game" className="px-4 py-12 text-center">
+        {/* <section id="game" className="px-4 py-12 text-center">
           <div className="mx-auto flex justify-center md:w-2/3">
             <Game />
           </div>
         </section>
         <section id="synth" className="px-4 py-12 text-center">
           <SynthControls />
-        </section>
+        </section> */}
 
         <section id="community" className="px-4 py-12 text-center">
           <h2 className="mb-6 text-3xl text-cyan-400">Community & Mentorship</h2>
