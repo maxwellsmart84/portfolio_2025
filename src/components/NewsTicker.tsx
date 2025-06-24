@@ -67,17 +67,21 @@ const NewsTicker: React.FC = () => {
   return (
     <div className="w-full overflow-hidden border-y-2 border-purple-300 bg-black py-2 drop-shadow-[0_0_10px_purple]">
       <motion.div
-        className="flex whitespace-nowrap"
-        animate={{ x: ['100%', '-100%'] }}
+        className="flex whitespace-nowrap will-change-transform"
+        animate={{ x: ['0%', '-100%'] }}
         transition={{
-          duration: isMobile ? 15 : 40, // Faster on mobile
+          duration: isMobile ? 25 : 50,
           repeat: Infinity,
           ease: 'linear',
         }}
+        style={{ display: 'inline-flex' }}
       >
-        {/* Duplicate stories for seamless loop */}
         {[...stories, ...stories].map((story, index) => (
-          <div key={`${story.id}-${index}`} className="flex items-center whitespace-nowrap">
+          <div
+            key={`${story.id}-${index}`}
+            className="flex items-center whitespace-nowrap"
+            style={{ width: 'max-content' }}
+          >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
