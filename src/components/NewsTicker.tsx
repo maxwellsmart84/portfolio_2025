@@ -70,7 +70,7 @@ const NewsTicker: React.FC = () => {
         className="flex whitespace-nowrap will-change-transform"
         animate={{ x: ['0%', '-100%'] }}
         transition={{
-          duration: isMobile ? 25 : 50,
+          duration: isMobile ? 85 : 175,
           repeat: Infinity,
           ease: 'linear',
         }}
