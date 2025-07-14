@@ -24,7 +24,7 @@ const formatDate = (unixTimestamp: number) => {
 
 const NewsTicker: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null); // null until we know
 
   useEffect(() => {
     const checkMobile = () => {
@@ -70,7 +70,7 @@ const NewsTicker: React.FC = () => {
         className="flex whitespace-nowrap will-change-transform"
         animate={{ x: ['0%', '-100%'] }}
         transition={{
-          duration: isMobile ? 60 : 175,
+          duration: isMobile === null ? 300 : isMobile ? 150 : 300,
           repeat: Infinity,
           ease: 'linear',
         }}
