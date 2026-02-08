@@ -113,6 +113,70 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+/* Custom Fonts */
+@font-face {
+  font-family: 'Library 3 am';
+  src: url('/assets/library-3-am/Library 3 am.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Library 3 am Soft';
+  src: url('/assets/library-3-am/Library 3 am soft.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neon';
+  src: url('/assets/neon-font/Neon-e2wg.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeonGlow';
+  src: url('/assets/neon-glow-font/NeonGlow-8VLz.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeonGlow';
+  src: url('/assets/neon-glow-font/NeonGlowBold-YxJv.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeonGlow';
+  src: url('/assets/neon-glow-font/NeonGlowItalic-MxJr.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'NeonGlow Hollow';
+  src: url('/assets/neon-glow-font/NeonGlowHollow-KqGp.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeonGlow Light';
+  src: url('/assets/neon-glow-font/NeonGlowLight-w9PZ.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeonLights';
+  src: url('/assets/neon-lights-font/NeonLights-22d.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

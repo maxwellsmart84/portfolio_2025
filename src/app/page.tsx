@@ -65,7 +65,10 @@ export default function Home() {
             whileTap={{ scale: 0.95 }}
             //  className="bg-cyan-500 hover:bg-cyan-400 shadow-[0_0_10px_cyan] text-white font-bold py-2 px-4 rounded"
           >
-            <h1 className="mt-14 mb-14 rounded-md border-2 border-purple-400 p-8 text-5xl font-bold text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-7xl md:outline-4 md:outline-offset-[1rem] md:outline-purple-400">
+            <h1 
+              className="mt-14 mb-14 rounded-md border-2 border-purple-400 p-8 text-5xl font-bold text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-7xl md:outline-4 md:outline-offset-[1rem] md:outline-purple-400"
+              style={{ fontFamily: "'Neon', sans-serif" }}
+            >
               Maxwell Krause
             </h1>
           </motion.button>
@@ -104,6 +107,138 @@ export default function Home() {
           </div>
         </section>
 
+        {/* <section id="fonts" className="px-4 py-12 text-center">
+          <h2 className="mb-8 text-3xl text-cyan-400">Font Showcase</h2>
+          <div className="mx-auto max-w-6xl space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">Library 3 am</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'Library 3 am', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">Library 3 am Soft</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'Library 3 am Soft', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">Neon</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'Neon', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">NeonGlow</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'NeonGlow', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">NeonGlow Bold</p>
+              <h3
+                className="text-4xl font-bold text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'NeonGlow', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">NeonGlow Hollow</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'NeonGlow Hollow', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">NeonGlow Light</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'NeonGlow Light', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.7 }}
+              className="rounded-lg border border-purple-400 bg-gray-900/50 p-6 shadow-[0_0_15px_purple]"
+            >
+              <p className="mb-2 text-sm text-purple-300">NeonLights</p>
+              <h3
+                className="text-4xl text-cyan-400 drop-shadow-[0_0_15px_cyan] md:text-6xl"
+                style={{ fontFamily: "'NeonLights', sans-serif" }}
+              >
+                Maxwell Krause
+              </h3>
+            </motion.div>
+          </div>
+        </section> */}
+
         <section id="game" className="px-4 py-12 text-center">
           <div className="mx-auto flex justify-center md:w-2/3">
             <Game />
@@ -116,7 +251,7 @@ export default function Home() {
         <section id="projects" className="px-4 py-12 text-center">
           <h2 className="mb-10 text-3xl text-cyan-400">Projects</h2>
           <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
-            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+            <Card className="h-[580px] border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent
                 onClick={() => window.open('https://hackathon-chs.vercel.app/', '_blank')}
                 className="cursor-pointer p-6"
@@ -141,7 +276,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
+            <Card className="h-[580px] border border-cyan-500 bg-gray-900 shadow-[0_0_15px_cyan] transition-all hover:scale-105">
               <CardContent className="p-6">
                 <Image
                   src="/assets/challenger-app.png"
