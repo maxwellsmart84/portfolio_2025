@@ -34,6 +34,8 @@ export default function PriceChart({ ticker }: PriceChartProps) {
   const [marketData, setMarketData] = useState<PricePoint[]>([]);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 0 });
   const socketRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -53,6 +55,8 @@ export default function PriceChart({ ticker }: PriceChartProps) {
 
   // Connect to Binance WebSocket for real-time trades
   useEffect(() => {
+    mountedRef.current = true;
+
     const endpoints = [
       `wss://stream.binance.com:9443/ws/${ticker}@ticker`,
       `wss://stream.binance.com:443/ws/${ticker}@ticker`,
@@ -63,14 +67,9 @@ export default function PriceChart({ ticker }: PriceChartProps) {
     let currentEndpointIndex = 0;
 
     const connectWebSocket = () => {
-      // if (currentEndpointIndex >= endpoints.length) {
-      //   console.error('All Binance endpoints failed. Using mock data...');
-      //   // Start mock data generation as fallback
-      //   startMockData();
-      //   return;
-      // }
+      if (!mountedRef.current) return;
 
-      const endpoint = endpoints[currentEndpointIndex];
+      const endpoint = endpoints[currentEndpointIndex % endpoints.length];
       console.log(`Attempting to connect to: ${endpoint}`);
 
       const ws = new WebSocket(endpoint);
@@ -81,12 +80,11 @@ export default function PriceChart({ ticker }: PriceChartProps) {
       };
 
       ws.onmessage = event => {
+        if (!mountedRef.current) return;
         try {
           const data = JSON.parse(event.data);
-          // console.log('Received data:', data)
 
           const price = parseFloat(data.c);
-          // console.log('Price:', price);
           const time = new Date().toLocaleTimeString();
           const newPoint = { time, price };
 
@@ -102,18 +100,16 @@ export default function PriceChart({ ticker }: PriceChartProps) {
         }
       };
 
-      ws.onerror = err => {
-        console.error(`WebSocket Error for ${endpoint}:`, err);
-        console.error('WebSocket readyState:', ws.readyState);
-        currentEndpointIndex++;
-        setTimeout(connectWebSocket, 2000); // Try next endpoint after 2 seconds
+      ws.onerror = () => {
+        console.warn(`WebSocket connection failed for ${endpoint}, will retry via onclose`);
+        // onclose will always fire after onerror — handle reconnect there only
       };
 
       ws.onclose = event => {
         console.log(`WebSocket closed for ${endpoint}:`, event.code, event.reason);
-        if (event.code !== 1000) {
+        if (event.code !== 1000 && mountedRef.current) {
           currentEndpointIndex++;
-          setTimeout(connectWebSocket, 2000); // Try next endpoint
+          reconnectTimeoutRef.current = setTimeout(connectWebSocket, 2000); // Try next endpoint
         }
       };
     };
@@ -143,9 +139,14 @@ export default function PriceChart({ ticker }: PriceChartProps) {
     connectWebSocket();
 
     return () => {
-      console.log('Cleaning up WebSocket connection');
+      mountedRef.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (socketRef.current) {
-        socketRef.current.close();
+        socketRef.current.close(1000, 'Component unmounted');
+        socketRef.current = null;
       }
     };
   }, []);
